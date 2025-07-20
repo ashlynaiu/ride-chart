@@ -1,11 +1,127 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StarIcon } from '@heroicons/react/24/solid';
 import { twMerge } from 'tailwind-merge';
 
 type RatingSize = 'sm' | 'md' | 'lg';
 type RatingVariant = 'default' | 'readonly' | 'interactive';
 
-type RatingProps = {
-  value: number;\n  onChange?: (value: number) => void;\n  size?: RatingSize;\n  variant?: RatingVariant;\n  count?: number;\n  className?: string;\n  label?: string;\n  error?: string;\n  helperText?: string;\n  showValue?: boolean;\n  color?: string;\n};
+interface RatingProps {
+  value: number;
+  onChange?: (value: number) => void;
+  size?: RatingSize;
+  variant?: RatingVariant;
+  count?: number;
+  className?: string;
+  label?: string;
+  error?: string;
+  helperText?: string;
+  showValue?: boolean;
+  color?: string;
+}
 
-const sizeClasses: Record<RatingSize, string> = {\n  sm: 'h-4 w-4',\n  md: 'h-6 w-6',\n  lg: 'h-8 w-8',\n};\n\nconst Rating: React.FC<RatingProps> = ({\n  value = 0,\n  onChange,\n  size = 'md',\n  variant = 'default',\n  count = 5,\n  className = '',\n  label,\n  error,\n  helperText,\n  showValue = false,\n  color = 'text-yellow-400',\n}) => {\n  const [hoverValue, setHoverValue] = useState<number | null>(null);\n  const [isHovering, setIsHovering] = useState(false);\n  const isInteractive = variant === 'interactive' && !!onChange;\n  const displayValue = isHovering && hoverValue !== null ? hoverValue : value;\n\n  const handleClick = (newValue: number) => {\n    if (isInteractive) {\n      onChange?.(newValue);\n    }\n  };\n\n  const handleMouseEnter = (newValue: number) => {\n    if (isInteractive) {\n      setHoverValue(newValue);\n      setIsHovering(true);\n    }\n  };\n\n  const handleMouseLeave = () => {\n    if (isInteractive) {\n      setHoverValue(null);\n      setIsHovering(false);\n    }\n  };\n\n  return (\n    <div className={twMerge('flex flex-col', className)}>\n      {label && (\n        <label className="block text-sm font-medium text-gray-700 mb-1">\n          {label}\n        </label>\n      )}\n      <div className="flex items-center">\n        <div className="flex">\n          {[...Array(count)].map((_, index) => {\n            const ratingValue = index + 1;\n            const isFilled = ratingValue <= (displayValue || 0);\n            const isHalfFilled =\n              ratingValue - 0.5 <= (displayValue || 0) &&\n              ratingValue > (displayValue || 0);\n\n            return (\n              <div\n                key={ratingValue}\n                className={`relative ${sizeClasses[size]} ${\n                  isInteractive ? 'cursor-pointer' : ''\n                }`}\n                onClick={() => handleClick(ratingValue)}\n                onMouseEnter={() => handleMouseEnter(ratingValue)}\n                onMouseLeave={handleMouseLeave}\n                role={isInteractive ? 'button' : 'presentation'}\n                tabIndex={isInteractive ? 0 : -1}\n                onKeyDown={(e) => {\n                  if (isInteractive && e.key === 'Enter') {\n                    handleClick(ratingValue);\n                  }\n                }}\n              >\n                <StarIcon\n                  className={`${\n                    isFilled || isHalfFilled ? color : 'text-gray-300'\n                  } ${sizeClasses[size]}`}\n                />\n                {isHalfFilled && (\n                  <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>\n                    <StarIcon\n                      className={`${color} ${sizeClasses[size]}`}\n                    />\n                  </div>\n                )}\n              </div>\n            );\n          })}\n        </div>\n        {showValue && (\n          <span className="ml-2 text-sm text-gray-500">\n            {displayValue.toFixed(1)}\n          </span>\n        )}\n      </div>\n      {helperText && !error && (\n        <p className="mt-1 text-sm text-gray-500">{helperText}</p>\n      )}\n      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}\n    </div>\n  );\n};\n\nexport default Rating;
+const sizeClasses: Record<RatingSize, string> = {
+  sm: 'h-4 w-4',
+  md: 'h-6 w-6',
+  lg: 'h-8 w-8',
+};
+
+const Rating: React.FC<RatingProps> = ({
+  value = 0,
+  onChange,
+  size = 'md',
+  variant = 'default',
+  count = 5,
+  className = '',
+  label,
+  error,
+  helperText,
+  showValue = false,
+  color = 'text-yellow-400',
+}) => {
+  const [hoverValue, setHoverValue] = useState<number | null>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const isInteractive = variant === 'interactive' && !!onChange;
+  const displayValue = isHovering && hoverValue !== null ? hoverValue : value;
+
+  const handleClick = (newValue: number) => {
+    if (isInteractive) {
+      onChange?.(newValue);
+    }
+  };
+
+  const handleMouseEnter = (newValue: number) => {
+    if (isInteractive) {
+      setHoverValue(newValue);
+      setIsHovering(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (isInteractive) {
+      setHoverValue(null);
+      setIsHovering(false);
+    }
+  };
+
+  return (
+    <div className={twMerge('flex flex-col', className)}>
+      {label && (
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+      )}
+      <div className="flex items-center">
+        <div className="flex">
+          {[...Array(count)].map((_, index) => {
+            const ratingValue = index + 1;
+            const isFilled = ratingValue <= (displayValue || 0);
+            const isHalfFilled =
+              ratingValue - 0.5 <= (displayValue || 0) &&
+              ratingValue > (displayValue || 0);
+
+            return (
+              <div
+                key={ratingValue}
+                className={`relative ${sizeClasses[size]} ${
+                  isInteractive ? 'cursor-pointer' : ''
+                }`}
+                onClick={() => handleClick(ratingValue)}
+                onMouseEnter={() => handleMouseEnter(ratingValue)}
+                onMouseLeave={handleMouseLeave}
+                role={isInteractive ? 'button' : 'presentation'}
+                tabIndex={isInteractive ? 0 : -1}
+                onKeyDown={(e) => {
+                  if (isInteractive && e.key === 'Enter') {
+                    handleClick(ratingValue);
+                  }
+                }}
+              >
+                <StarIcon
+                  className={`${
+                    isFilled || isHalfFilled ? color : 'text-gray-300'
+                  } ${sizeClasses[size]}`}
+                />
+                {isHalfFilled && (
+                  <div className="absolute inset-0 overflow-hidden" style={{ width: '50%' }}>
+                    <StarIcon className={`${color} ${sizeClasses[size]}`} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {showValue && (
+          <span className="ml-2 text-sm text-gray-500">
+            {displayValue.toFixed(1)}
+          </span>
+        )}
+      </div>
+      {helperText && !error && (
+        <p className="mt-1 text-sm text-gray-500">{helperText}</p>
+      )}
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+    </div>
+  );
+};
+
+export default Rating;

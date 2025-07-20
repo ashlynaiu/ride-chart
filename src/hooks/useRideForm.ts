@@ -1,3 +1,4 @@
+import React from 'react';
 import { useForm, UseFormReturn, FieldValues } from 'react-hook-form';
 import { Ride } from '../store/slices/ridesSlice';
 
@@ -7,7 +8,7 @@ type UseRideFormProps = {
 
 type UseRideFormReturn = {
   form: UseFormReturn<Partial<Ride>>;
-  handleSubmit: (data: Partial<Ride>) => Promise<void>;
+  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   isSubmitting: boolean;
   error: string | null;
 };
@@ -55,7 +56,7 @@ export const useRideForm = ({
 
   return {
     form,
-    handleSubmit: form.handleSubmit(handleSubmit),
+    handleSubmit: form.handleSubmit(handleSubmit) as unknown as (e?: React.BaseSyntheticEvent) => Promise<void>,
     isSubmitting,
     error,
   };

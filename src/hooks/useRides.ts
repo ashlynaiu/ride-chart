@@ -66,7 +66,7 @@ export const useRides = () => {
     if (status === 'idle') {
       loadRides();
     }
-  }, [status]);
+  }, [status, loadRides]);
 
   return {
     rides,

@@ -26,7 +26,7 @@ const RideForm: React.FC = () => {
   
   const isEditMode = !!rideId;
   
-  const { register, handleSubmit, reset, formState: { errors }, setValue } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>();
   
   // Set form values if in edit mode
   useEffect(() => {
